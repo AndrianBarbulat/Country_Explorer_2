@@ -1,21 +1,10 @@
 <script>
-    // Import onMount lifecycle function from svelte
     import { onMount } from 'svelte';
-
-    // Import authentication functions from firebase
     import { getAuth, onAuthStateChanged } from 'firebase/auth';
-
-    // Import database functions from firebase
     import { getDatabase, ref, get } from 'firebase/database';
-
-    // Import navigate function from svelte-routing
     import { navigate } from 'svelte-routing';
-
-    // Import Leaflet library and CSS
     import L from 'leaflet';
     import 'leaflet/dist/leaflet.css';
-
-    // Import Footer component
     import Footer from "./assets/Footer.svelte";
 
     let map;
@@ -23,7 +12,6 @@
     let landmarkCount = 0;
     let latestLogin = '';
 
-    // Initialize map and fetch user data on component mount
     onMount(() => {
         const auth = getAuth();
         const db = getDatabase();
@@ -33,18 +21,16 @@
                 fetchLandmarks(db, user.uid);
                 latestLogin = 'Last login: ' + new Date(user.metadata.lastSignInTime).toLocaleString();
             } else {
-                console.log('No user is logged in.');
                 navigate('/signin');
             }
         });
 
         map = L.map('map').setView([51.505, -0.09], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
+            attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
     });
 
-    // Function to fetch landmarks from the database
     async function fetchLandmarks(db, userId) {
         const categoriesRef = ref(db, `users/${userId}/categories`);
         const snapshot = await get(categoriesRef);
@@ -65,103 +51,166 @@
             if (landmarks.length > 0) {
                 map.setView([landmarks[0].latitude, landmarks[0].longitude], 10);
             }
-        } else {
-            console.log('No categories found for user ID ' + userId);
         }
     }
 </script>
 
+<main class="gradient-bg home-page">
+    <div class="hero fade-in">
+        <h1 class="hero-title">Welcome to Country Explorer</h1>
+        {#if latestLogin}
+            <p class="last-login">{latestLogin}</p>
+        {/if}
+    </div>
+
+    <div class="home-grid fade-in">
+        <div class="map-card glass-card">
+            <h2 class="card-heading">Your Landmarks</h2>
+            <div class="map-wrapper">
+                <div id="map"></div>
+            </div>
+        </div>
+
+        <div class="side-panel">
+            <div class="stat-card glass-card">
+                <div class="stat-number">{landmarkCount}</div>
+                <div class="stat-label">Total Landmarks</div>
+            </div>
+
+            <button
+                class="btn-primary explore-btn"
+                on:click={() => navigate('/map-category')}
+            >
+                Explore All Landmarks
+            </button>
+
+            <button
+                class="btn-ghost manage-btn"
+                on:click={() => navigate('/category')}
+            >
+                Manage Categories
+            </button>
+        </div>
+    </div>
+</main>
+<Footer />
+
 <style>
-    main {
+    .home-page {
         display: flex;
         flex-direction: column;
         align-items: center;
-        min-height: 100vh;
-        background: linear-gradient(-45deg, #4eb99f, #122f41, #ed563b, #f2b035);
-        background-size: 400% 400%;
-        animation: gradient 15s ease infinite;
+        padding: 40px 24px 0;
         color: white;
-        padding: 20px; 
-        font-size: 18px; 
+    }
+
+    .hero {
+        text-align: center;
+        margin-bottom: 32px;
+    }
+
+    .hero-title {
+        font-size: clamp(24px, 4vw, 36px);
+        font-weight: 700;
+        margin: 0 0 8px;
+        letter-spacing: -0.5px;
+    }
+
+    .last-login {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.55);
+        margin: 0;
+    }
+
+    .home-grid {
+        display: grid;
+        grid-template-columns: 1fr 280px;
+        gap: 24px;
+        width: 100%;
+        max-width: 1100px;
+    }
+
+    .map-card {
+        padding: 20px;
+    }
+
+    .map-card:hover {
+        transform: none;
+    }
+
+    .card-heading {
+        font-size: 16px;
+        font-weight: 600;
+        margin: 0 0 14px;
+        color: rgba(255, 255, 255, 0.85);
     }
 
     #map {
-        height: 300px;
+        height: 420px;
         width: 100%;
-        margin: 8px;
+        border-radius: 12px;
+        overflow: hidden;
     }
 
-    section {
-        width: 100%; 
+    .side-panel {
         display: flex;
-        justify-content: space-between;
-        margin-bottom: 40px; 
+        flex-direction: column;
+        gap: 16px;
     }
 
-    @keyframes moveNeon {
-        0% {
-            background-position: 0% 50%;
+    .stat-card {
+        text-align: center;
+        padding: 32px 24px;
+    }
+
+    .stat-number {
+        font-size: 52px;
+        font-weight: 700;
+        color: #4eb99f;
+        line-height: 1;
+        margin-bottom: 8px;
+    }
+
+    .stat-label {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.6);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .explore-btn {
+        width: 100%;
+        padding: 14px;
+        font-size: 15px;
+    }
+
+    .manage-btn {
+        width: 100%;
+        padding: 13px;
+    }
+
+    @media (max-width: 768px) {
+        .home-grid {
+            grid-template-columns: 1fr;
         }
-        50% {
-            background-position: 100% 50%;
+
+        #map {
+            height: 280px;
         }
-        100% {
-            background-position: 0% 50%;
+
+        .side-panel {
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .explore-btn,
+        .manage-btn {
+            flex: 1;
         }
     }
-
-    .neonBox {
-        padding: 0px -1px;
-        margin: 10px;
-        border-radius: 15px; 
-        background: linear-gradient(270deg, rgba(85, 255, 225, 0.8), rgba(73, 77, 139, 0.8), rgba(255, 255, 85, 0.8));
-        background-size: 400% 400%;
-        animation: moveNeon 8s ease infinite; 
-        color: white;
-        font-size: 16px;
-        border: none;
-    }
-
-
-    .column {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 300px;
-    }
-
-    .buttonHome {
-        padding: 12px 24px; 
-        background-color: #32a852; 
-        color: white;
-        border: none;
-        cursor: pointer;
-        transition: background-color 0.3s; 
-        font-size: 16px;
-    }
-
-    .buttonHome:hover {
-        background-color: #278a40 !important; 
-    }
-
 </style>
-
-<main>
-    <h1>Welcome to Country Explorer 2</h1>
-    <section>
-        <div class="column" id="map"></div>
-        <div class="column neonBox">
-            <h2>Total Landmarks: {landmarkCount}</h2>
-        </div>
-    </section>
-    <section>
-        <div class="column neonBox">
-            <p>{latestLogin}</p>
-        </div>
-        <div class="column neonBox">
-            <button class="buttonHome" on:click={() => navigate('/map-category')}>Explore Landmarks</button>
-        </div>
-    </section>
-</main>
-<Footer />

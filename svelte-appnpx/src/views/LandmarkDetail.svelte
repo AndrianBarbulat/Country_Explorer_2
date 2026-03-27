@@ -1,21 +1,10 @@
 <script>
-    // Import onMount lifecycle function from svelte
     import { onMount } from 'svelte';
-
-    // Import landmark controller functions
     import { getLandmarkDetails, updateLandmarkDetails } from '../controllers/landmarkController';
-
-    // Import user store from authStore
     import { user } from '../stores/authStore';
-
-    // Import navigate function from svelte-routing
     import { navigate } from 'svelte-routing';
-
-    // Import storage functions from firebase
     import { ref, deleteObject } from 'firebase/storage';
     import { storage } from '../services/firebase';
-
-    // Import Footer component
     import Footer from './assets/Footer.svelte';
 
     export let categoryId;
@@ -35,7 +24,6 @@
 
     $: $user, checkAuthState();
 
-    // Function to check authentication state
     function checkAuthState() {
         if ($user === undefined) {
             loading = true;
@@ -49,7 +37,6 @@
         }
     }
 
-    // Function to initialize landmark details
     async function initializeLandmark() {
         if (categoryId && landmarkId) {
             try {
@@ -60,7 +47,6 @@
                     isPrivate: fetchedLandmark.isPrivate || false
                 };
             } catch (err) {
-                console.error("Failed to load landmark details:", err);
                 error = "Failed to load landmark details.";
             }
             loading = false;
@@ -70,228 +56,337 @@
         }
     }
 
-    // Function to save landmark details
     async function saveLandmarkDetails() {
         saveError = '';
         loading = true;
         try {
             await updateLandmarkDetails(categoryId, landmarkId, landmark);
-            console.log("Details updated successfully, redirecting to category page.");
             navigate(`/category`);
         } catch (err) {
-            console.error("Failed to update landmark details:", err);
             saveError = "Failed to update landmark details.";
             loading = false;
         }
     }
 
-    // Function to delete an image
     async function deleteImage(imageUrl) {
         const imageRef = ref(storage, imageUrl);
         try {
             await deleteObject(imageRef);
-            console.log('File deleted successfully');
             landmark.imageUrls = landmark.imageUrls.filter(url => url !== imageUrl);
             await updateLandmarkDetails(categoryId, landmarkId, { ...landmark, imageUrls: landmark.imageUrls });
         } catch (error) {
-            console.error('Error removing file:', error);
+            // deletion failed silently — image ref may be invalid
         }
     }
 </script>
 
+<main class="gradient-bg detail-page">
+    <div class="detail-wrapper fade-in">
+        <div class="page-header">
+            <button class="back-btn btn-ghost" on:click={() => navigate('/category')}>
+                &#8592; Back to Categories
+            </button>
+            <h1 class="page-title">Edit Landmark</h1>
+        </div>
+
+        {#if loading}
+            <div class="glass-card loading-card">
+                <p class="loading-text">Loading landmark…</p>
+            </div>
+        {:else if error}
+            <div class="msg-error">{error}</div>
+        {:else}
+            <form class="glass-card form-card" on:submit|preventDefault={saveLandmarkDetails}>
+
+                <div class="field-group">
+                    <label class="glass-label" for="ldName">Landmark Name</label>
+                    <input
+                        id="ldName"
+                        class="glass-input"
+                        type="text"
+                        bind:value={landmark.name}
+                        placeholder="Enter landmark name"
+                    />
+                </div>
+
+                <div class="field-group">
+                    <label class="glass-label" for="ldDesc">Description</label>
+                    <textarea
+                        id="ldDesc"
+                        class="glass-input glass-textarea"
+                        bind:value={landmark.description}
+                        placeholder="Describe this landmark…"
+                        rows="4"
+                    ></textarea>
+                </div>
+
+                <div class="coord-row">
+                    <div class="field-group">
+                        <label class="glass-label" for="ldLat">Latitude</label>
+                        <input
+                            id="ldLat"
+                            class="glass-input"
+                            type="number"
+                            step="0.000001"
+                            bind:value={landmark.latitude}
+                            placeholder="e.g. 51.505"
+                        />
+                    </div>
+                    <div class="field-group">
+                        <label class="glass-label" for="ldLon">Longitude</label>
+                        <input
+                            id="ldLon"
+                            class="glass-input"
+                            type="number"
+                            step="0.000001"
+                            bind:value={landmark.longitude}
+                            placeholder="e.g. -0.09"
+                        />
+                    </div>
+                </div>
+
+                <div class="field-group privacy-row">
+                    <span class="glass-label">Visibility</span>
+                    <label class="toggle-wrap">
+                        <input
+                            id="privacyToggle"
+                            type="checkbox"
+                            class="toggle-input"
+                            bind:checked={landmark.isPrivate}
+                        />
+                        <span class="toggle-track">
+                            <span class="toggle-thumb"></span>
+                        </span>
+                        <span class="toggle-text">
+                            {landmark.isPrivate ? 'Private' : 'Public'}
+                        </span>
+                    </label>
+                </div>
+
+                {#if Array.isArray(landmark.imageUrls) && landmark.imageUrls.length > 0}
+                    <div class="field-group">
+                        <span class="glass-label">Images</span>
+                        <div class="images-grid">
+                            {#each landmark.imageUrls as url (url)}
+                                <div class="image-thumb">
+                                    <img src={url} alt="Landmark image" />
+                                    <button
+                                        type="button"
+                                        class="img-delete"
+                                        on:click={() => deleteImage(url)}
+                                        aria-label="Delete image"
+                                    >&#10005;</button>
+                                </div>
+                            {/each}
+                        </div>
+                    </div>
+                {/if}
+
+                {#if saveError}
+                    <div class="msg-error">{saveError}</div>
+                {/if}
+
+                <div class="form-actions">
+                    <button type="button" class="btn-ghost" on:click={() => navigate('/category')}>
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        {/if}
+    </div>
+</main>
+<Footer />
+
 <style>
-    main {
+    .detail-page {
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-        background: linear-gradient(-45deg, #4eb99f, #122f41, #ed563b, #f2b035);
-        background-size: 400% 400%;
-        animation: gradient 15s ease infinite;
-        padding: 20px;
+        padding: 40px 24px 60px;
         color: white;
+    }
+
+    .detail-wrapper {
         width: 100%;
-        box-sizing: border-box;
-    }
-
-    .box {
-        width: 80%;
-        max-width: 800px;
-        background-color: rgba(0, 0, 0, 0.6);
-        padding: 20px;
-        border-radius: 8px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .input, .textarea {
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 10px;
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        color: white;
-    }
-
-    .button {
-        background-color: #f2b035;
-        color: white;
-        cursor: pointer;
-        padding: 10px 20px;
-        border-radius: 4px;
-        transition: background-color 0.2s ease;
-    }
-
-    .button:hover {
-        background-color: #ed563b;
-    }
-
-    .images-container {
+        max-width: 680px;
         display: flex;
-        flex-wrap: wrap;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .page-header {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .back-btn {
+        align-self: flex-start;
+        font-size: 13px;
+        padding: 7px 16px;
+    }
+
+    .page-title {
+        font-size: clamp(22px, 3vw, 28px);
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .loading-card {
+        text-align: center;
+    }
+
+    .form-card {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .form-card:hover {
+        transform: none;
+    }
+
+    .field-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .coord-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .glass-textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    /* ── Privacy toggle ── */
+    .privacy-row {
+        flex-direction: row;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .toggle-wrap {
+        display: flex;
+        align-items: center;
         gap: 10px;
-        margin-top: 10px;
-    }
-
-    .image-wrapper {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 100px;
-    }
-
-    .image-wrapper img {
-        width: 100%;
-        height: auto;
-        border-radius: 4px;
-    }
-
-    .delete-button {
-        background-color: #ff4d4d;
-        color: white;
-        border: none;
-        padding: 5px 10px;
-        border-radius: 4px;
-        margin-top: 5px;
         cursor: pointer;
-        transition: background-color 0.2s;
     }
 
-    .delete-button:hover {
-        background-color: #ff3333;
+    .toggle-input {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
     }
 
-    .toggle-control {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-top: 10px;
-    }
-
-    .toggle {
-        display: none;
-    }
-
-    .toggle + .toggle-label {
+    .toggle-track {
         position: relative;
-        display: inline-block;
-        width: 60px;
+        width: 44px;
         height: 24px;
-        background-color: #ccc;
-        border-radius: 30px;
-        padding: 2px;
-        transition: background-color 0.3s;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        transition: background 0.3s ease;
+        flex-shrink: 0;
+        border: 1px solid rgba(255, 255, 255, 0.15);
     }
 
-    .toggle:checked + .toggle-label {
-        background-color: #48c774;
+    .toggle-input:checked ~ .toggle-track {
+        background: #4eb99f;
+        border-color: #4eb99f;
     }
 
-    .toggle-label::after {
-        content: '';
+    .toggle-thumb {
         position: absolute;
         top: 2px;
         left: 2px;
+        width: 18px;
+        height: 18px;
+        background: white;
+        border-radius: 50%;
+        transition: transform 0.3s ease;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .toggle-input:checked ~ .toggle-track .toggle-thumb {
+        transform: translateX(20px);
+    }
+
+    .toggle-text {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* ── Image grid ── */
+    .images-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .image-thumb {
+        position: relative;
+        width: 90px;
+    }
+
+    .image-thumb img {
+        width: 100%;
+        height: 70px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .img-delete {
+        position: absolute;
+        top: -6px;
+        right: -6px;
         width: 20px;
         height: 20px;
-        background-color: white;
+        background: #ed563b;
+        color: white;
+        border: none;
         border-radius: 50%;
-        transition: transform 0.3s;
+        cursor: pointer;
+        font-size: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+        transition: background 0.2s ease;
     }
 
-    .toggle:checked + .toggle-label::after {
-        transform: translateX(36px);
+    .img-delete:hover {
+        background: #c0392b;
     }
 
-    .notification {
-        background-color: rgba(0, 0, 0, 0.5);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 8px;
-        padding: 10px;
-        width: 80%;
+    /* ── Form actions ── */
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        padding-top: 8px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    @media (max-width: 480px) {
+        .coord-row {
+            grid-template-columns: 1fr;
+        }
+
+        .form-actions {
+            flex-direction: column-reverse;
+        }
+
+        .form-actions button {
+            width: 100%;
+        }
     }
 </style>
-
-<main>
-    <h1 class="title has-text-white">Edit Landmark Details</h1>
-    {#if loading}
-        <progress class="progress is-small is-primary" max="100">Loading...</progress>
-    {:else if error}
-        <p class="notification is-danger">{error}</p>
-    {:else}
-        <div class="box">
-            <div class="field">
-                <label class="label has-text-white">Name:</label>
-                <div class="control">
-                    <input class="input" type="text" bind:value={landmark.name}>
-                </div>
-            </div>
-            <div class="field">
-                <label class="label has-text-white">Description:</label>
-                <div class="control">
-                    <textarea class="textarea" bind:value={landmark.description}></textarea>
-                </div>
-            </div>
-            <div class="field">
-                <label class="label has-text-white">Latitude:</label>
-                <div class="control">
-                    <input class="input" type="number" step="0.0001" bind:value={landmark.latitude}>
-                </div>
-            </div>
-            <div class="field">
-                <label class="label has-text-white">Longitude:</label>
-                <div class="control">
-                    <input class="input" type="number" step="0.0001" bind:value={landmark.longitude}>
-                </div>
-            </div>
-            <div class="field">
-                <label class="label has-text-white">Privacy:</label>
-                <div class="toggle-control">
-                    <input id="privacyToggle" type="checkbox" class="toggle" bind:checked={landmark.isPrivate}>
-                    <label for="privacyToggle" class="toggle-label"></label>
-                </div>
-            </div>
-            
-            {#if Array.isArray(landmark.imageUrls) && landmark.imageUrls.length > 0}
-            <div class="field">
-                <label class="label has-text-white">Images:</label>
-                <div class="control images-container">
-                    {#each landmark.imageUrls as url (url)}
-                        <div class="image-wrapper">
-                            <img src={url} alt="Landmark Image">
-                            <button class="delete-button" on:click={() => deleteImage(url)}>Delete</button>
-                        </div>
-                    {/each}
-                </div>
-            </div>
-            {/if}
-            {#if saveError}
-                <p class="notification is-danger">{saveError}</p>
-            {/if}
-            <div class="control">
-                <button class="button is-success" on:click={saveLandmarkDetails}>Save</button>
-            </div>
-        </div>
-    {/if}
-</main>
-<Footer />

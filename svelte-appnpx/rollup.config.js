@@ -5,6 +5,10 @@ import terser from '@rollup/plugin-terser';
 import resolve from '@rollup/plugin-node-resolve';
 import livereload from 'rollup-plugin-livereload';
 import css from 'rollup-plugin-css-only';
+import replace from '@rollup/plugin-replace';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -38,38 +42,38 @@ export default {
 		file: 'public/build/bundle.js'
 	},
 	plugins: [
+		replace({
+			preventAssignment: true,
+			values: {
+				// App env vars
+				'process.env.FIREBASE_API_KEY':          JSON.stringify(process.env.FIREBASE_API_KEY),
+				'process.env.FIREBASE_AUTH_DOMAIN':      JSON.stringify(process.env.FIREBASE_AUTH_DOMAIN),
+				'process.env.FIREBASE_DATABASE_URL':     JSON.stringify(process.env.FIREBASE_DATABASE_URL),
+				'process.env.FIREBASE_PROJECT_ID':       JSON.stringify(process.env.FIREBASE_PROJECT_ID),
+				'process.env.FIREBASE_STORAGE_BUCKET':   JSON.stringify(process.env.FIREBASE_STORAGE_BUCKET),
+				'process.env.FIREBASE_MESSAGING_SENDER_ID': JSON.stringify(process.env.FIREBASE_MESSAGING_SENDER_ID),
+				'process.env.FIREBASE_APP_ID':           JSON.stringify(process.env.FIREBASE_APP_ID),
+				'process.env.FIREBASE_MEASUREMENT_ID':   JSON.stringify(process.env.FIREBASE_MEASUREMENT_ID),
+				'process.env.OPENWEATHER_API_KEY':       JSON.stringify(process.env.OPENWEATHER_API_KEY),
+				// Required for Firebase SDK and other packages that check NODE_ENV at runtime
+				'process.env.NODE_ENV':                  JSON.stringify(production ? 'production' : 'development'),
+				'process.browser':                       JSON.stringify(true),
+			}
+		}),
 		svelte({
 			compilerOptions: {
-				// enable run-time checks when not in production
 				dev: !production
 			}
 		}),
-		// we'll extract any component CSS out into
-		// a separate file - better for performance
 		css({ output: 'bundle.css' }),
-
-		// If you have external dependencies installed from
-		// npm, you'll most likely need these plugins. In
-		// some cases you'll need additional configuration -
-		// consult the documentation for details:
-		// https://github.com/rollup/plugins/tree/master/packages/commonjs
 		resolve({
 			browser: true,
 			dedupe: ['svelte'],
 			exportConditions: ['svelte']
 		}),
 		commonjs(),
-
-		// In dev mode, call `npm run start` once
-		// the bundle has been generated
 		!production && serve(),
-
-		// Watch the `public` directory and refresh the
-		// browser on changes when not in production
 		!production && livereload('public'),
-
-		// If we're building for production (npm run build
-		// instead of npm run dev), minify
 		production && terser()
 	],
 	watch: {
