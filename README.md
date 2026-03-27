@@ -9,22 +9,21 @@ A web application built with Svelte and Firebase that lets users explore, save, 
 ## Screenshots
 
 <p align="center">
-  <img src="projectPresentationPhotos/svelte-appnpx/01.png" width="45%" alt="Sign In Page" />
-  <img src="projectPresentationPhotos/svelte-appnpx/02.png" width="45%" alt="Home Dashboard" />
+  <img src="svelte-appnpx/projectPresentationPhotos/01.png" width="45%" alt="Sign In Page" />
+  <img src="svelte-appnpx/projectPresentationPhotos/02.png" width="45%" alt="Home Dashboard" />
 </p>
 <p align="center">
-  <img src="projectPresentationPhotos/svelte-appnpx/03.png" width="45%" alt="Map View" />
-  <img src="projectPresentationPhotos/svelte-appnpx/04.png" width="45%" alt="Landmark Detail" />
+  <img src="svelte-appnpx/projectPresentationPhotos/03.png" width="45%" alt="Map View" />
+  <img src="svelte-appnpx/projectPresentationPhotos/04.png" width="45%" alt="Landmark Detail" />
 </p>
 <p align="center">
-  <img src="projectPresentationPhotos/svelte-appnpx/05.png" width="45%" alt="Photo Gallery" />
-  <img src="projectPresentationPhotos/svelte-appnpx/06.png" width="45%" alt="Weather Info" />
+  <img src="svelte-appnpx/projectPresentationPhotos/05.png" width="45%" alt="Photo Gallery" />
+  <img src="svelte-appnpx/projectPresentationPhotos/06.png" width="45%" alt="Weather Info" />
 </p>
 <p align="center">
-  <img src="projectPresentationPhotos/svelte-appnpx/07.png" width="45%" alt="Admin Panel" />
-  <img src="projectPresentationPhotos/svelte-appnpx/08.png" width="45%" alt="Category View" />
+  <img src="svelte-appnpx/projectPresentationPhotos/07.png" width="45%" alt="Admin Panel" />
+  <img src="svelte-appnpx/projectPresentationPhotos/08.png" width="45%" alt="Category View" />
 </p>
-
 > Adjust the filenames above to match the actual image files in your `projectPresentationPhotos/svelte-appnpx/` folder.
 
 ---
