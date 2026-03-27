@@ -1,71 +1,147 @@
-# Country Explorer README
+# Country Explorer 2
 
-Welcome to Country Explorer, a sophisticated web application crafted using Svelte that incorporates interactive charts, real-time Leaflet maps, and Firebase integration for a comprehensive user experience. Country Explorer allows users to sign up, sign in, add locations with descriptions, upload multiple photos with authentication, and check weather conditions for each location.
+A web application built with Svelte and Firebase that lets users explore, save, and share locations around the world. Users can mark places on an interactive map, upload photos, write descriptions, and check real-time weather conditions — all within a secure, authenticated experience.
 
-## Key Features
+**Live Demo:** [country-explorer-2.vercel.app](https://country-explorer-2.vercel.app/)
 
-- **User Authentication**: Secure authentication system powered by Firebase, enabling users to sign up and sign in efficiently.
-- **Interactive Maps**: Utilize Leaflet to display dynamic maps where users can add and view locations.
-- **Data Visualization**: Integration of Chart.js enhanced with date-fns for rendering time-sensitive data associated with various locations.
-- **Real-Time Database Interaction**: Firebase Realtime Database is used to handle and store user data such as locations and photo uploads.
-- **Photo Gallery**: Users can upload multiple images to each location, displayed elegantly in a responsive gallery.
-- **Weather Information**: Fetch and display real-time weather conditions for each location using reliable weather APIs.
+---
 
-## Technology Stack
+## Screenshots
 
-- **Svelte**: A modern tool for building fast and reactive web interfaces.
-- **Leaflet**: A leading open-source JavaScript library for mobile-friendly interactive maps.
-- **Firebase**: Comprehensive suite for application development including authentication, database, and storage solutions, developed by Google.
-- **Chart.js**: Simple yet flexible JavaScript charting for developers and designers.
+<p align="center">
+  <img src="projectPresentationPhotos/svelte-appnpx/01.png" width="45%" alt="Sign In Page" />
+  <img src="projectPresentationPhotos/svelte-appnpx/02.png" width="45%" alt="Home Dashboard" />
+</p>
+<p align="center">
+  <img src="projectPresentationPhotos/svelte-appnpx/03.png" width="45%" alt="Map View" />
+  <img src="projectPresentationPhotos/svelte-appnpx/04.png" width="45%" alt="Landmark Detail" />
+</p>
+<p align="center">
+  <img src="projectPresentationPhotos/svelte-appnpx/05.png" width="45%" alt="Photo Gallery" />
+  <img src="projectPresentationPhotos/svelte-appnpx/06.png" width="45%" alt="Weather Info" />
+</p>
+<p align="center">
+  <img src="projectPresentationPhotos/svelte-appnpx/07.png" width="45%" alt="Admin Panel" />
+  <img src="projectPresentationPhotos/svelte-appnpx/08.png" width="45%" alt="Category View" />
+</p>
+
+> Adjust the filenames above to match the actual image files in your `projectPresentationPhotos/svelte-appnpx/` folder.
+
+---
+
+## Features
+
+- **User Authentication** — Sign up and sign in securely with Google via Firebase Auth
+- **Interactive Maps** — Explore landmarks on a Leaflet map, click to add new locations, drag markers to adjust
+- **Photo Gallery** — Upload multiple images per landmark with lazy-loaded, responsive gallery views
+- **Real-Time Data** — Firebase Realtime Database keeps everything synced across sessions
+- **Weather Info** — Check live weather conditions for any saved location using the OpenWeatherMap API
+- **Data Visualisation** — Admin dashboard with Chart.js graphs showing login activity and device stats
+- **Privacy Controls** — Mark landmarks as public or private
+- **Responsive Design** — Glassmorphism UI with animated gradient backgrounds, works on mobile and desktop
+
+---
+
+## Tech Stack
+
+| Technology | Purpose |
+|---|---|
+| **Svelte** | Frontend framework for reactive, component-based UI |
+| **Firebase** | Authentication, Realtime Database, and Cloud Storage |
+| **Leaflet** | Interactive maps with marker placement and geocoding |
+| **Chart.js** | Data visualisation for the admin dashboard |
+| **OpenWeatherMap API** | Live weather data for saved locations |
+| **Rollup** | Module bundler for building the production app |
+| **Vercel** | Hosting and deployment |
+
+---
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
-
 ### Prerequisites
 
-Make sure you have Node.js installed on your machine, which can be downloaded from [nodejs.org](https://nodejs.org/).
+- [Node.js](https://nodejs.org/) (v18 or higher recommended)
+- A [Firebase project](https://console.firebase.google.com/) with Authentication, Realtime Database, and Storage enabled
+- An [OpenWeatherMap API key](https://openweathermap.org/api)
 
 ### Installation
 
-1. Clone the repository from GitHub:
-   ```bash
-   git clone https://github.com/GuineaCoding/Country_Explorer_2.git
-   ```
-2. Change to the project directory:
-   ```bash
-   cd Country_Explorer_2
-   ```
-3. Install the required packages:
-   ```bash
-   npm install
-   ```
+```bash
+git clone https://github.com/AndrianBarbulat/Country_Explorer_2.git
+cd Country_Explorer_2/svelte-appnpx
+npm install
+```
 
-### Running the Application
+### Environment Variables
 
-- **Development Mode**:
-  ```bash
-  npm run dev
-  ```
-  This command starts the server with live reloading enabled.
+Create a `.env` file in the `svelte-appnpx` directory:
 
-- **Build the Application**:
-  ```bash
-  npm run build
-  ```
-  Compile the application into static files for production.
+```env
+FIREBASE_API_KEY=your_api_key
+FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+FIREBASE_DATABASE_URL=https://your_project.firebaseio.com
+FIREBASE_PROJECT_ID=your_project_id
+FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+FIREBASE_APP_ID=your_app_id
+FIREBASE_MEASUREMENT_ID=your_measurement_id
+OPENWEATHER_API_KEY=your_openweather_key
+```
 
-- **Start the Server**:
-  ```bash
-  npm run start
-  ```
-  Serve the built application on a local server.
+### Running Locally
 
-## Usage
+```bash
+npm run dev
+```
 
-Once the setup is complete, you can:
+Opens the app at `http://localhost:8080` with live reloading.
 
-- **Sign Up/Sign In**: Register a new account or log in to access personalized features.
-- **Add Locations**: Mark locations on the map and provide detailed descriptions.
-- **Upload Photos**: Attach photos to enhance the location descriptions within the user-friendly gallery.
-- **Check Weather**: View up-to-date weather conditions at each location to better plan your activities.
+### Building for Production
+
+```bash
+npm run build
+npm run start
+```
+
+---
+
+## Deployment
+
+The app is deployed on [Vercel](https://vercel.com). On every push to `main`, Vercel automatically builds and deploys.
+
+Environment variables are configured in the Vercel dashboard under **Settings → Environment Variables** using the same keys listed above.
+
+Firebase authorised domains must include your Vercel URL for Google Sign-In to work in production.
+
+---
+
+## Project Structure
+
+```
+svelte-appnpx/
+├── public/              # Static assets and built output
+├── src/
+│   ├── controllers/     # Business logic layer
+│   ├── models/          # Firebase data models
+│   ├── services/        # Firebase config and service setup
+│   ├── stores/          # Svelte writable stores (auth, state)
+│   ├── styles/          # Shared CSS files
+│   ├── views/           # Svelte page components
+│   │   └── assets/      # Reusable UI components (Navbar, Footer, Sidebar)
+│   └── main.js          # App entry point
+├── .env.example         # Environment variable template
+├── rollup.config.js     # Rollup build configuration
+└── package.json
+```
+
+---
+
+## Author
+
+Andrian Barbulat
+
+---
+
+## License
+
+This project is developed for educational purposes as part of a university assignment.
