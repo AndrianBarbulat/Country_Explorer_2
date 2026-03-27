@@ -1,6 +1,6 @@
 # Country Explorer 2
 
-A web application built with Svelte and Firebase that lets users explore, save, and share locations around the world. Users can mark places on an interactive map, upload photos, write descriptions, and check real-time weather conditions — all within a secure, authenticated experience.
+A web application built with Svelte and Firebase that lets users explore, save, and share locations around the world. Users can mark places on an interactive map, upload photos, write descriptions, and check real-time weather conditions, all within a secure, authenticated experience.
 
 **Live Demo:** [country-explorer-2.vercel.app](https://country-explorer-2.vercel.app/)
 
@@ -24,7 +24,6 @@ A web application built with Svelte and Firebase that lets users explore, save, 
   <img src="svelte-appnpx/projectPresentationPhotos/05.png" width="45%" alt="Admin Panel" />
   <img src="svelte-appnpx/projectPresentationPhotos/07.png" width="45%" alt="Category View" />
 </p>
-> Adjust the filenames above to match the actual image files in your `projectPresentationPhotos/svelte-appnpx/` folder.
 
 ---
 
